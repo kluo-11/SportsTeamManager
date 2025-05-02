@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Schedule</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-4">Manage Schedule</h1>
+
+        <!-- Filter Events Form -->
+        <form method="POST" action="{{ url_for('schedule') }}" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="team">Select Team</label>
+                    <select name="team" id="team" class="form-control">
+                        <option value="">-- All Teams --</option>
+                        {% for team in teams %}
+                        <option value="{{ team.team_id }}" {% if request.form.team == team.team_id %}selected{% endif %}>{{ team.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.form.get('start_date', '') }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="end_date">End Date</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.form.get('end_date', '') }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Filter</button>
+        </form>
+
+        <!-- Events Table -->
+        <h3>Schedule List</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Team</th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Opponent</th>
+            <th>Team Score</th>
+            <th>Opponent Score</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in filtered_schedule %}
+        <tr>
+            <td>{{ row.type }}</td>
+            <td>{{ row.team_name }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.location }}</td>
+            <td>{{ row.opponent or '-' }}</td>
+            <td>{{ row.team_score if row.team_score is not none else '-' }}</td>
+            <td>{{ row.opponent_score if row.opponent_score is not none else '-' }}</td>
+            <td>{{ row.result or '-' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="8" class="text-center">No scheduled events or matches found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+        
+        <!-- Back to Home Page -->
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

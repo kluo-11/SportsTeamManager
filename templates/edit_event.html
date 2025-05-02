@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Event</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function toggleMatchFields() {
+            const isMatch = document.getElementById("is_match").checked;
+            document.getElementById("match_fields").style.display = isMatch ? "block" : "none";
+        }
+
+        window.onload = function () {
+            toggleMatchFields(); // toggle on load
+        };
+    </script>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Edit Event</h2>
+    <form method="POST">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label>Team</label>
+                <select name="team_id" class="form-control">
+                    {% for team in teams %}
+                        <option value="{{ team.team_id }}" {% if team.team_id == event.team_id %}selected{% endif %}>{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label>Event Type</label>
+                <input type="text" name="event_type" class="form-control" value="{{ event.event_type }}" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label>Date</label>
+                <input type="datetime-local" name="event_date" class="form-control" value="{{ event.event_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+            </div>
+            <div class="form-group col-md-3">
+                <label>Location</label>
+                <input type="text" name="location" class="form-control" value="{{ event.location }}" required>
+            </div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="is_match" name="is_match" onchange="toggleMatchFields()" {% if match %}checked{% endif %}>
+            <label class="form-check-label" for="is_match">Include Match Details</label>
+        </div>
+
+        <div id="match_fields" style="display: none;">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label>Opponent Team</label>
+                    <input type="text" name="opponent_team_name" class="form-control" value="{{ match.opponent_team_name if match else '' }}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Team Score</label>
+                    <input type="number" name="team_score" class="form-control" value="{{ match.team_score if match else '' }}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Opponent Score</label>
+                    <input type="number" name="opponent_score" class="form-control" value="{{ match.opponent_score if match else '' }}">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Result</label>
+                    <select name="result" class="form-control">
+                        <option value="">-- Select --</option>
+                        <option value="win" {% if match and match.result == 'win' %}selected{% endif %}>Win</option>
+                        <option value="loss" {% if match and match.result == 'loss' %}selected{% endif %}>Loss</option>
+                        <option value="draw" {% if match and match.result == 'draw' %}selected{% endif %}>Draw</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Save Changes</button>
+        <a href="{{ url_for('manage_schedule') }}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

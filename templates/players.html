@@ -3,52 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Players</title>
+    <title>Players</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1 class="mt-4 mb-4">Manage Players</h1>
-        
-        <!-- Add New Player Button -->
-        <a href="{{ url_for('add_player') }}" class="btn btn-success mb-4">Add New Player</a>
+    <div class="container mt-4">
+        <h1 class="mb-4">Players</h1>
+        <a href="{{ url_for('add_player') }}" class="btn btn-success mb-3">Add Player</a>
 
-        <!-- Players Report Button -->
-        <a href="{{ url_for('players_report') }}" class="btn btn-success mb-4">View Players Report</a>
-
-        <!-- Players Table -->
-        <h3>Players List</h3>
-        <table class="table table-bordered">
-            <thead>
+        <table class="table table-striped">
+            <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
                     <th>Team</th>
+                    <th>Role</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for player in players %}
+                {% for membership in memberships %}
                 <tr>
-                    <td>{{ player.name }}</td>
-                    <td>{{ player.team.name }}</td>
+                    <td>{{ membership.player.first_name }} {{ membership.player.last_name }}</td>
+                    <td>{{ membership.player.email }}</td>
+                    <td>{{ membership.player.phone }}</td>
+                    <td>{{ membership.team.name }}</td>
+                    <td>{{ membership.role or 'N/A' }}</td>
                     <td>
-                        <a href="{{ url_for('edit_player', player_id=player.player_id) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form method="POST" action="{{ url_for('delete_player', player_id=player.player_id) }}" class="d-inline">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this player?')">Delete</button>
+                        <a href="{{ url_for('edit_player', player_id=membership.player.player_id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <form action="{{ url_for('delete_player', player_id=membership.player.player_id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this player?');">Delete</button>
                         </form>
-                        
                     </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3" class="text-center">No players found</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <!-- Back to Home Page -->
-        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Home</a>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Home</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

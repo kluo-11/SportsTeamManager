@@ -9,26 +9,60 @@
 <body>
     <div class="container">
         <h1 class="mt-4 mb-4">Add Player</h1>
-        
-        <!-- Add Player Form -->
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <form method="POST" action="{{ url_for('add_player') }}">
             <div class="form-group">
-                <label for="name">Player Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                <label for="first_name">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
             </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone">
+            </div>
+
             <div class="form-group">
                 <label for="team_id">Select Team</label>
                 <select class="form-control" id="team_id" name="team_id" required>
-                    <option value="">Choose a Team</option>  <!-- Default empty option -->
+                    <option value="">Choose a Team</option>
                     {% for team in teams %}
                         <option value="{{ team.team_id }}">{{ team.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Add Player</button>
-        </form>        
 
-        <!-- Back to Players Page -->
+            <div class="form-group">
+                <label for="role">Role</label>
+                <input type="text" class="form-control" id="role" name="role" placeholder="e.g. Player, Captain">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Player</button>
+        </form>
+
         <a href="{{ url_for('manage_players') }}" class="btn btn-secondary mt-3">Back to Players</a>
     </div>
 

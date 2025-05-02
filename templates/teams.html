@@ -19,7 +19,7 @@
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Sport Type</th>
+                    <th>Sport</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -27,7 +27,7 @@
                 {% for team in teams %}
                 <tr>
                     <td>{{ team.name }}</td>
-                    <td>{{ team.sport_type }}</td>
+                    <td>{{ team.sport }}</td>
                     <td>
                         <a href="{{ url_for('edit_team', team_id=team.team_id) }}" class="btn btn-warning btn-sm d-inline">Edit</a>
                         <form method="POST" action="{{ url_for('delete_team', team_id=team.team_id) }}" class="d-inline">

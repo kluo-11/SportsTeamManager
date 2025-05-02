@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Events and Matches</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function toggleMatchFields() {
+            const isMatch = document.getElementById("is_match").checked;
+            document.getElementById("match_fields").style.display = isMatch ? "block" : "none";
+        }
+    </script>
+</head>
+<body>
+<div class="container mt-4">
+    <h2>Manage Events & Matches</h2>
+
+    <form method="POST" class="mb-4">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label>Team</label>
+                <select name="team_id" class="form-control" required>
+                    {% for team in teams %}
+                        <option value="{{ team.team_id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label>Event Type</label>
+                <input type="text" name="event_type" class="form-control" required>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label>Date</label>
+                <input type="datetime-local" name="event_date" class="form-control" required>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label>Location</label>
+                <input type="text" name="location" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="is_match" name="is_match" onchange="toggleMatchFields()">
+            <label class="form-check-label" for="is_match">Include Match Details</label>
+        </div>
+
+        <div id="match_fields" style="display: none;">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label>Opponent Team</label>
+                    <input type="text" name="opponent_team" class="form-control">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Team Score</label>
+                    <input type="number" name="team_score" class="form-control">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Opponent Score</label>
+                    <input type="number" name="opponent_score" class="form-control">
+                </div>
+                <div class="form-group col-md-2">
+                    <label>Result</label>
+                    <select name="result" class="form-control">
+                        <option value="">-- Select --</option>
+                        <option value="win">Win</option>
+                        <option value="loss">Loss</option>
+                        <option value="draw">Draw</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Add Event</button>
+    </form>
+
+    <h4>Current Schedule</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Event Type</th>
+                <th>Team</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Opponent</th>
+                <th>Score</th>
+                <th>Result</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for e in schedule %}
+            <tr>
+                <td>{{ e.event_type }}</td>
+                <td>{{ e.team_name }}</td>
+                <td>{{ e.event_date }}</td>
+                <td>{{ e.location }}</td>
+                <td>{{ e.opponent_team or '-' }}</td>
+                <td>
+                    {% if e.team_score is not none %}
+                        {{ e.team_score }} - {{ e.opponent_score }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ e.result or '-' }}</td>
+                <td>
+                    <a href="{{ url_for('edit_event', event_id=e.event_id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <form action="{{ url_for('delete_event', event_id=e.event_id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Home</a>
+</div>
+</body>
+</html>
