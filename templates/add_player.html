@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Player</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-4">Add Player</h1>
+        
+        <!-- Add Player Form -->
+        <form method="POST" action="{{ url_for('add_player') }}">
+            <div class="form-group">
+                <label for="name">Player Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="team_id">Select Team</label>
+                <select class="form-control" id="team_id" name="team_id" required>
+                    <option value="">Choose a Team</option>  <!-- Default empty option -->
+                    {% for team in teams %}
+                        <option value="{{ team.team_id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Player</button>
+        </form>        
+
+        <!-- Back to Players Page -->
+        <a href="{{ url_for('manage_players') }}" class="btn btn-secondary mt-3">Back to Players</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
