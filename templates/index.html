@@ -12,11 +12,19 @@
 
         <!-- Navigation Links -->
         <div class="row">
-            <div class="col">
+            <div class="col-md-4">
                 <a href="{{ url_for('manage_players') }}" class="btn btn-primary btn-block mb-3">Manage Players</a>
             </div>
-            <div class="col">
+            <div class="col-md-4">
                 <a href="{{ url_for('manage_teams') }}" class="btn btn-primary btn-block mb-3">Manage Teams</a>
+            </div>
+            <div class="col-md-4">
+                <a href="{{ url_for('schedule') }}" class="btn btn-success btn-block mb-3">View Schedule</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <a href="{{ url_for('manage_schedule') }}" class="btn btn-info btn-block mb-3">Manage Schedule</a>
             </div>
         </div>
     </div>
