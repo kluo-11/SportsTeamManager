@@ -23,7 +23,6 @@ class Team(db.Model):
     name = db.Column(db.String(255), nullable=False)
     sport = db.Column(db.String(255), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('Users.user_id'))
-    members = db.relationship('Membership', backref='team', lazy=True)
     events = db.relationship('Event', backref='team', lazy=True)
 
 class Player(db.Model):
@@ -34,15 +33,7 @@ class Player(db.Model):
     email = db.Column(db.String(255), nullable=False)
     phone = db.Column(db.String(255))
     team_id = db.Column(db.Integer, db.ForeignKey('Teams.team_id'))
-    memberships = db.relationship('Membership', backref='player', lazy=True)
     attendance_records = db.relationship('Attendance', backref='player', lazy=True)
-
-class Membership(db.Model):
-    __tablename__ = 'Memberships'
-    membership_id = db.Column(db.Integer, primary_key=True)
-    player_id = db.Column(db.Integer, db.ForeignKey('Players.player_id'))
-    team_id = db.Column(db.Integer, db.ForeignKey('Teams.team_id'))
-    role = db.Column(db.String(255))
 
 class Event(db.Model):
     __tablename__ = 'Events'

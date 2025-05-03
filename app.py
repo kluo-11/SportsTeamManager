@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, User, Team, Player, Membership, Event, Attendance, Match
+from models import db, User, Team, Player, Event, Attendance, Match
 from sqlalchemy import text
 
 app = Flask(__name__)
@@ -59,8 +59,8 @@ def delete_team(team_id):
 def manage_players():
     players = Player.query.all()
     teams = Team.query.all()
-    memberships = Membership.query.all()
-    return render_template('players.html', players=players, teams=teams, memberships=memberships)
+    team_lookup = {team.team_id: team.name for team in teams}
+    return render_template('players.html', players=players, teams=teams, team_lookup=team_lookup)
 
 @app.route('/add_player', methods=['GET', 'POST'])
 def add_player():
@@ -72,14 +72,15 @@ def add_player():
         email = request.form['email']
         phone = request.form['phone']
         team_id = request.form['team_id']
-        role = request.form['role']
 
-        player = Player(first_name=first_name, last_name=last_name, email=email, phone=phone)
+        player = Player(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            phone=phone,
+            team_id=team_id
+        )
         db.session.add(player)
-        db.session.commit()
-
-        membership = Membership(player_id=player.player_id, team_id=team_id, role=role)
-        db.session.add(membership)
         db.session.commit()
 
         return redirect(url_for('manage_players'))
@@ -89,7 +90,6 @@ def add_player():
 @app.route('/edit_player/<int:player_id>', methods=['GET', 'POST'])
 def edit_player(player_id):
     player = Player.query.get_or_404(player_id)
-    membership = Membership.query.filter_by(player_id=player_id).first()
     teams = Team.query.all()
 
     if request.method == 'POST':
@@ -97,17 +97,15 @@ def edit_player(player_id):
         player.last_name = request.form['last_name']
         player.email = request.form['email']
         player.phone = request.form['phone']
-        membership.team_id = request.form['team_id']
-        membership.role = request.form['role']
+        player.team_id = request.form['team_id']
         db.session.commit()
         return redirect(url_for('manage_players'))
 
-    return render_template('edit_player.html', player=player, membership=membership, teams=teams)
+    return render_template('edit_player.html', player=player, teams=teams)
 
 @app.route('/delete_player/<int:player_id>', methods=['POST'])
 def delete_player(player_id):
     player = Player.query.get_or_404(player_id)
-    Membership.query.filter_by(player_id=player_id).delete()
     db.session.delete(player)
     db.session.commit()
     return redirect(url_for('manage_players'))

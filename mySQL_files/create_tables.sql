@@ -23,15 +23,6 @@ CREATE TABLE Players (
     FOREIGN KEY (team_id) REFERENCES Teams(team_id)
 );
 
-CREATE TABLE Memberships (
-    membership_id INT AUTO_INCREMENT PRIMARY KEY,
-    player_id INT,
-    team_id INT,
-    role VARCHAR(255),
-    FOREIGN KEY (player_id) REFERENCES Players(player_id),
-    FOREIGN KEY (team_id) REFERENCES Teams(team_id)
-);
-
 CREATE TABLE Events (
     event_id INT AUTO_INCREMENT PRIMARY KEY,
     team_id INT,
