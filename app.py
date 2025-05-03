@@ -207,10 +207,10 @@ def manage_schedule():
         db.session.flush()  # Get event_id before commit
 
         if is_match:
-            opponent = request.form.get('opponent_team')
-            team_score = request.form.get('team_score')
-            opponent_score = request.form.get('opponent_score')
-            result = request.form.get('result')
+            opponent = request.form.get('opponent_team') or 'TBA'
+            team_score = request.form.get('team_score') or None
+            opponent_score = request.form.get('opponent_score') or None
+            result = request.form.get('result') or None
 
             match = Match(
                 event_id=new_event.event_id,
@@ -239,7 +239,7 @@ def manage_schedule():
         FROM Events e
         JOIN Teams t ON e.team_id = t.team_id
         LEFT JOIN Matches m ON e.event_id = m.event_id
-        ORDER BY e.event_date DESC
+        ORDER BY e.event_date ASC
     """)).fetchall()
 
     return render_template('manage_schedule.html', teams=teams, schedule=schedule)
