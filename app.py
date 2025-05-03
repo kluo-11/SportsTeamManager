@@ -134,61 +134,60 @@ def view_rosters():
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule():
     teams = Team.query.all()
-    filtered_schedule = []
 
-    if request.method == 'POST':
-        team_id = request.form.get('team')
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
+    team_id = request.form.get('team') if request.method == 'POST' else None
+    start_date = request.form.get('start_date') if request.method == 'POST' else None
+    end_date = request.form.get('end_date') if request.method == 'POST' else None
 
-        query = text("""
-            -- Events that are NOT Matches
-            SELECT
-                e.event_type AS type,
-                t.name AS team_name,
-                e.event_date AS date,
-                e.location AS location,
-                NULL AS opponent,
-                NULL AS team_score,
-                NULL AS opponent_score,
-                NULL AS result
-            FROM Events e
-            JOIN Teams t ON e.team_id = t.team_id
-            LEFT JOIN Matches m ON e.event_id = m.event_id  -- Check if it's a match
-            WHERE m.event_id IS NULL  -- Only events without matches
-              AND (:team_id IS NULL OR e.team_id = :team_id)
-              AND (:start_date IS NULL OR e.event_date >= :start_date)
-              AND (:end_date IS NULL OR e.event_date <= :end_date)
+    query = text("""
+        -- Events that are NOT Matches
+        SELECT
+            e.event_type AS type,
+            t.name AS team_name,
+            e.event_date AS date,
+            e.location AS location,
+            NULL AS opponent,
+            NULL AS team_score,
+            NULL AS opponent_score,
+            NULL AS result
+        FROM Events e
+        JOIN Teams t ON e.team_id = t.team_id
+        LEFT JOIN Matches m ON e.event_id = m.event_id
+        WHERE m.event_id IS NULL
+          AND (:team_id IS NULL OR e.team_id = :team_id)
+          AND (:start_date IS NULL OR e.event_date >= :start_date)
+          AND (:end_date IS NULL OR e.event_date <= :end_date)
 
-            UNION ALL
+        UNION ALL
 
-            -- Matches
-            SELECT 
-                'Match' AS type,
-                t.name AS team_name,
-                e.event_date AS date,
-                e.location AS location,
-                m.opponent_team AS opponent,
-                m.team_score AS team_score,
-                m.opponent_score AS opponent_score,
-                m.result AS result
-            FROM Matches m
-            JOIN Events e ON m.event_id = e.event_id
-            JOIN Teams t ON e.team_id = t.team_id
-            WHERE (:team_id IS NULL OR e.team_id = :team_id)
-              AND (:start_date IS NULL OR e.event_date >= :start_date)
-              AND (:end_date IS NULL OR e.event_date <= :end_date)
+        -- Matches
+        SELECT 
+            'Match' AS type,
+            t.name AS team_name,
+            e.event_date AS date,
+            e.location AS location,
+            m.opponent_team AS opponent,
+            m.team_score AS team_score,
+            m.opponent_score AS opponent_score,
+            m.result AS result
+        FROM Matches m
+        JOIN Events e ON m.event_id = e.event_id
+        JOIN Teams t ON e.team_id = t.team_id
+        WHERE (:team_id IS NULL OR e.team_id = :team_id)
+          AND (:start_date IS NULL OR e.event_date >= :start_date)
+          AND (:end_date IS NULL OR e.event_date <= :end_date)
 
-            ORDER BY date ASC
-        """)
+        ORDER BY date ASC
+    """)
 
-        filtered_schedule = db.session.execute(query, {
-            'team_id': team_id or None,
-            'start_date': start_date or None,
-            'end_date': end_date or None
-        }).fetchall()
+    filtered_schedule = db.session.execute(query, {
+        'team_id': team_id or None,
+        'start_date': start_date or None,
+        'end_date': end_date or None
+    }).fetchall()
 
     return render_template('schedule.html', teams=teams, filtered_schedule=filtered_schedule)
+
 
 @app.route('/manage_schedule', methods=['GET', 'POST'])
 def manage_schedule():
