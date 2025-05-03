@@ -10,8 +10,11 @@
     <div class="container">
         <h1 class="mt-4 mb-4">Manage Teams</h1>
 
-        <!-- Add New Team Button -->
-        <a href="{{ url_for('add_team') }}" class="btn btn-success mb-4">Add New Team</a>
+        <div class="mb-4">
+            <a href="{{ url_for('add_team') }}" class="btn btn-success mr-2">Add New Team</a>
+            <a href="{{ url_for('view_rosters') }}" class="btn btn-primary">View Rosters</a>
+        </div>
+        
 
         <!-- Teams Table -->
         <h3>Teams List</h3>

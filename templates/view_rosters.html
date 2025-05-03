@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Rosters</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4 mb-4">View Rosters</h1>
+
+        <!-- Team Filter -->
+        <form method="GET" action="{{ url_for('view_rosters') }}">
+            <div class="form-row mb-4">
+                <div class="col">
+                    <label for="team">Filter by Team</label>
+                    <select class="form-control" name="team" id="team">
+                        <option value="">All Teams</option>
+                        {% for team in teams %}
+                            <option value="{{ team.team_id }}" {% if team.team_id == request.args.get('team')|int %}selected{% endif %}>
+                                {{ team.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Apply Filter</button>
+        </form>
+
+        <!-- Roster Table -->
+        <h3 class="mt-4">Player List</h3>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Team</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ player.first_name }} {{ player.last_name }}</td>
+                    <td>{{ player.email }}</td>
+                    <td>{{ player.phone or 'N/A' }}</td>
+                    <td>{{ team_lookup[player.team_id] if player.team_id in team_lookup else 'Unassigned' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">No players found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+        <!-- Optional Back Button -->
+        <a href="{{ url_for('manage_teams') }}" class="btn btn-secondary mt-3">Back to Teams</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, User, Team, Player, Event, Attendance, Match
-from sqlalchemy import text
+from sqlalchemy import text, func
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:mypass@localhost/sports_team_manager'
@@ -110,22 +110,24 @@ def delete_player(player_id):
     db.session.commit()
     return redirect(url_for('manage_players'))
 
-# ----------- REPORT ------------
+# ----------- ROSTER ------------
 
-'''@app.route('/players_report')
-def players_report():
+@app.route('/view_rosters', methods=['GET'])
+def view_rosters():
     team_id = request.args.get('team', type=int)
     teams = Team.query.all()
+    team_lookup = {team.team_id: team.name for team in teams}
+
 
     if team_id:
-        memberships = Membership.query.filter_by(team_id=team_id).all()
-        player_ids = [m.player_id for m in memberships]
-        players = Player.query.filter(Player.player_id.in_(player_ids)).all()
+        # Fetch players associated with the selected team
+        players = Player.query.filter_by(team_id=team_id).all()
     else:
+        # Fetch all players if no team is selected
         players = Player.query.all()
 
-    return render_template('players_report.html', players=players, teams=teams)
-'''
+    return render_template('view_rosters.html', players=players, teams=teams, team_lookup=team_lookup)
+
 
 # ----------- SCHEDULE ------------
 
@@ -140,8 +142,8 @@ def schedule():
         end_date = request.form.get('end_date')
 
         query = text("""
-            -- Events
-            SELECT 
+            -- Events that are NOT Matches
+            SELECT
                 e.event_type AS type,
                 t.name AS team_name,
                 e.event_date AS date,
@@ -152,11 +154,13 @@ def schedule():
                 NULL AS result
             FROM Events e
             JOIN Teams t ON e.team_id = t.team_id
-            WHERE (:team_id IS NULL OR e.team_id = :team_id)
+            LEFT JOIN Matches m ON e.event_id = m.event_id  -- Check if it's a match
+            WHERE m.event_id IS NULL  -- Only events without matches
+              AND (:team_id IS NULL OR e.team_id = :team_id)
               AND (:start_date IS NULL OR e.event_date >= :start_date)
               AND (:end_date IS NULL OR e.event_date <= :end_date)
 
-            UNION
+            UNION ALL
 
             -- Matches
             SELECT 
@@ -260,7 +264,7 @@ def edit_event(event_id):
             db.session.add(match)
 
         if is_match:
-            match.opponent_team_name = request.form['opponent_team_name']
+            match.opponent_team = request.form['opponent_team']
             match.team_score = request.form['team_score']
             match.opponent_score = request.form['opponent_score']
             match.result = request.form['result']
