@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, User, Team, Player, Event, Attendance, Match
-from sqlalchemy import text, func
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:mypass@localhost/sports_team_manager'
@@ -188,7 +188,6 @@ def schedule():
 
     return render_template('schedule.html', teams=teams, filtered_schedule=filtered_schedule)
 
-
 @app.route('/manage_schedule', methods=['GET', 'POST'])
 def manage_schedule():
     teams = Team.query.all()
@@ -207,7 +206,7 @@ def manage_schedule():
         db.session.flush()  # Get event_id before commit
 
         if is_match:
-            opponent = request.form.get('opponent_team') or 'TBA'
+            opponent = request.form.get('opponent_team') or 'TBD'
             team_score = request.form.get('team_score') or None
             opponent_score = request.form.get('opponent_score') or None
             result = request.form.get('result') or None
